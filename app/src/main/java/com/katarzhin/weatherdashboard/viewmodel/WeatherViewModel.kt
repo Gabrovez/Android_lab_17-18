@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.async
 import kotlin.String
 
@@ -18,8 +20,24 @@ class WeatherViewModel : ViewModel() {
     private val _weatherState = MutableStateFlow(WeatherData())
     val weatherState: StateFlow<WeatherData> = _weatherState.asStateFlow()
 
+    private fun startAutoRefresh() {
+        viewModelScope.launch {
+            flow {
+                while (true) {
+                    delay(10000)
+                    emit(Unit)
+                }
+            }.collect {
+                loadWeatherData()
+            }
+        }
+    }
+
+
     init {
         loadWeatherData()
+        startAutoRefresh()
+        // viewModelScope автоматически отменит корутину при onCleared()
     }
 
     fun toggleErrorSimulation() {
