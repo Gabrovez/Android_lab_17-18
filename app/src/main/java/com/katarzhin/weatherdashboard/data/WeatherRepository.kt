@@ -2,12 +2,28 @@ package com.katarzhin.weatherdashboard.data
 
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WeatherRepository {
     private  var shouldFail = false
 
     fun toggleErrorSimulation() {
         shouldFail = !shouldFail
+    }
+
+    suspend fun calculateWeatherIndex(
+        temp: Int,
+        humidity: Int,
+        wind: Int
+    ): Int {
+        return withContext(Dispatchers.Default) {
+            var result = 0
+            for (i in 1..1000000) {
+                result += (temp + humidity + wind) / 3
+            }
+            result / 1000000
+        }
     }
 
     suspend fun fetchTemperature(): Int {
